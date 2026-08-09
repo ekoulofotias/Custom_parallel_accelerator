@@ -101,7 +101,7 @@ Custom_parallel_accelerator/
 
 # Run simulation
 
-        vvp sim_accelerator
+        vvp tb
 ```
 
 The testbench demonstrates:
