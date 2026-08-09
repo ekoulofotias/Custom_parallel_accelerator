@@ -9,7 +9,7 @@ VEC_SIZE      8     // Number of vector entries
 TOTAL_SIZE    64    // Total vector size (BIT_SIZE * VEC_SIZE)
 
 
---- EXECUTIONAL COMMAND WORDS (Non-Customizable) ---
+--- EXECUTION COMMAND WORDS (Non-Customizable) ---
 
 
 --- EXECUTION UNIT SELECTORS (Bits [63:61]) ---
@@ -56,7 +56,7 @@ TENSOR_ZB_ON     1'b1    // Enabled Zero Blocking feature (Bit [50])
 
 *** IMPORTANT NOTE *** 
 
-Matrix multiplications are executed in TWO discretε stages.
+Matrix multiplications are executed in TWO discrete stages.
 
 1) Dot products
 2) Summation of products.
