@@ -44,9 +44,9 @@ The system is based on a **top-down modular architecture**, combining specialize
 - Critical for sparse matrix acceleration
 
 ### Arithmetic Foundation
-- Full & half adder primitives
+- Full & half adder modules
 - N-bit adder/subtractor
-- Dot product accumulator
+- Dot product module
 
 ---
 
@@ -114,13 +114,3 @@ The testbench demonstrates:
 ## License
 
 MIT License — See `LICENSE` file for details.
-
----
-
-## Author Notes
-
-This project was developed as a **proof-of-concept** to demonstrate fundamental GPU architecture concepts during computer science studies. It showcases:
-- Modern parallel accelerator design patterns
-- Custom ISA development
-- RTL hardware description in Verilog
-- Pipeline optimization techniques
