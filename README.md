@@ -90,7 +90,7 @@ Custom_parallel_accelerator
 
 ### Requirements
 - Verilog simulator (Icarus Verilog, ModelSim, VCS, or similar)
-- (Optional) Yosys for synthesis
+- (Optional) Yosys for synthesis and system statistics
 
 ### Running the Testbench
 
