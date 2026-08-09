@@ -50,3 +50,8 @@ Repository Structure:
 ├── Custom_parallel_accelerator_Manual.txt # Hardware architectural manual
 └── ACCELERATOR_HARDWARE_OVERVIEW.txt   # Technical overview and specs
 
+## How to Simulate
+
+```bash
+iverilog -o tb *.v
+vvp tb
