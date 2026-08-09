@@ -32,26 +32,24 @@ The system is based on a top-down architecture, combining specialized units:
 Repository Structure:
 
 ```text
-├── parameters.vh                       # Global parameters and configuration
-├── top_accelerator.v                   # Top-level accelerator module integration
-├── tensor_grid_4x4.v                   # 4x4 Tensor Core grid (Matrix Multiplication)
-├── tensor_core_2x2.v                   # Basic 2x2 Tensor Core building block
-├── vector_alu.v                        # Vector Arithmetic Logic Unit
-├── vector_add_sub.v                    # Vector addition/subtraction unit
-├── vector_bitwise.v                    # Vector bitwise operations
-├── vector_hadamard.v                   # Vector Hadamard product unit
-├── dot_product.v                       # Dot product calculation unit
-├── add_sub_n_bit.v                     # N-bit Adder/Subtractor
-├── full_add.v                          # Full adder arithmetic module
-├── half_add.v                          # Half adder arithmetic module
-├── shifting.v                          # Shifting logic
-├── zero_block_detector.v               # Zero-block detection logic
-├── tb.v                                # Comprehensive testbench
-├── Custom_parallel_accelerator_Manual.txt # Hardware architectural manual
-└── ACCELERATOR_HARDWARE_OVERVIEW.txt   # Technical overview and specs
+├── parameters.vh                          # Global parameters and configuration
+├── top_accelerator.v                      # Top-level accelerator module integration
+├── tensor_grid_4x4.v                      # 4x4 Tensor Core grid (Matrix Multiplication)
+├── tensor_core_2x2.v                      # Basic 2x2 Tensor Core building block
+├── vector_alu.v                           # Vector Arithmetic Logic Unit
+├── vector_add_sub.v                       # Vector addition/subtraction unit
+├── vector_bitwise.v                       # Vector bitwise operations
+├── vector_hadamard.v                      # Vector Hadamard product unit
+├── dot_product.v                          # Dot product calculation unit
+├── add_sub_n_bit.v                        # N-bit Adder/Subtractor
+├── full_add.v                             # Full adder arithmetic module
+├── half_add.v                             # Half adder arithmetic module
+├── shifting.v                             # Shifting logic
+├── zero_block_detector.v                  # Zero-block detection logic
+├── tb.v                                   # Comprehensive testbench
+└── Custom_parallel_accelerator_Manual.txt # Hardware architectural manual
 
 ## How to Simulate
 
-```bash
 iverilog -o tb *.v
 vvp tb
