@@ -53,7 +53,7 @@ The system is based on a **top-down modular architecture**, combining specialize
 ## Repository Structure
 
 ```
-Custom_parallel_accelerator/
+Custom_parallel_accelerator
 ├── README.md                              # This file
 ├── LICENSE                                # MIT License
 ├── .gitignore                             # Git ignore rules
