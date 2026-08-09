@@ -1,0 +1,222 @@
+================================================================================
+                            CUSTOM PARALLEL ACCELERATOR ISA MANUAL
+================================================================================
+
+--- GENERAL DATA SIZE (Customizable) ---
+
+BIT_SIZE      8     // Data width per element (bits)
+VEC_SIZE      8     // Number of vector entries
+TOTAL_SIZE    64    // Total vector size (BIT_SIZE * VEC_SIZE)
+
+
+--- EXECUTIONAL COMMAND WORDS (Non-Customizable) ---
+
+
+--- EXECUTION UNIT SELECTORS (Bits [63:61]) ---
+
+UNIT_NONE        3'b000  // Idle / NOP
+UNIT_VECTOR_ALU  3'b001  // Vector ALU module
+UNIT_TENSOR_CORE 3'b010  // Tensor Core grid
+
+
+--- VECTOR ALU OPCODES (Bits [60:57]) ---
+
+VOP_ADD_SUB      4'b0001 // Addition / Subtraction
+VOP_BITWISE      4'b0010 // Bitwise logic operations
+VOP_SHIFT        4'b0011 // Data shifting
+VOP_HADAMARD     4'b0100 // Hadamard vector product
+VOP_DOT          4'b0101 // Dot product
+
+
+--- SUB-OPERATIONS (Bits [56:54]) ---
+
+-- For Addition / Subtraction
+OP_ADD           3'b000
+OP_SUB           3'b001
+
+-- For Bitwise Operations
+BITWISE_AND      3'b000
+BITWISE_OR       3'b001
+BITWISE_XOR      3'b010
+BITWISE_NOT      3'b011
+BITWISE_NAND     3'b100
+BITWISE_NOR      3'b101
+BITWISE_XNOR     3'b110
+
+-- For Shifting
+SHIFT_LEFT       3'b000
+SHIFT_RIGHT      3'b001
+
+
+--- TENSOR CORE OPCODES & MODES ---
+
+TOP_MATMUL       4'b0000 // For matrix multiplication in tensor core grid
+TENSOR_ZB_OFF    1'b0    // Disabled Zero Blocking feature (Bit [50])
+TENSOR_ZB_ON     1'b1    // Enabled Zero Blocking feature (Bit [50])
+
+*** IMPORTANT NOTE *** 
+
+Matrix multiplications are executed in TWO discretε stages.
+
+1) Dot products
+2) Summation of products.
+
+Thus, in order to get one entry of the result matrix, 
+TWO CLOCK CYCLES ARE NEEDED.
+
+================================================================================
+                              INSTRUCTION WORD FORMAT
+================================================================================
+
+  [x x x]    [x x x x]    [x x x]    [x x x]    [x]    [ x x x ... ]
+     a           b           c          d        e          f
+
+  a) Bits [63:61] : EXEC_UNIT  (3 bits)  - Select computation module (VALU / Tensor grid)
+  b) Bits [60:57] : OPCODE     (4 bits)  - Vector ALU opcode
+  c) Bits [56:54] : SUB_OP     (3 bits)  - Sub-command (e.g. bitwise op, add/sub, shift direction)
+  d) Bits [53:51] : SHIFT_POS  (3 bits)  - Shifting positions (0 to 7)
+  e) Bit  [50]    : ZERO_BLOCK (1 bit)   - Zero Blocking enable for Tensor Cores
+  f) Bits [49:0]  : RESERVED   (50 bits) - Null - For future expansion
+
+================================================================================
+                      4x4 MATRIX DECLARATION & LAYOUT
+================================================================================
+
+  Logical 4x4 Matrix (A or B) viewed as 4 separate 2x2 tensor core tiles.
+  Each tile is a 2x2 block of 8-bit registers passed into the grid:
+
++--------------------------------------------------------------------------+
+| 4x4 TENSOR GRID (tensor_grid_4x4.v)                                      |
+|                                                                          |
+|   +-------------------------------+     +---------------------------+    |
+|   | TC (tensor_core_2x2) [0,0]    |     | TC (tensor_core_2x2) [0,1]|    |
+|   |   +------+  +------+          |     |   +------+  +------+      |    |
+|   |   |  DP  |  |  DP  |          |     |   |  DP  |  |  DP  |      |    |
+|   |   +------+  +------+          |     |   +------+  +------+      |    |
+|   |   +------+  +------+          |     |   +------+  +------+      |    |
+|   |   |  DP  |  |  DP  |          |     |   |  DP  |  |  DP  |      |    |
+|   |   +------+  +------+          |     |   +------+  +------+      |    |
+|   +-------------------------------+     +---------------------------+    |
+|                                                                          |
+|   +-------------------------------+     +---------------------------+    |
+|   | TC (tensor_core_2x2) [1,0]    |     | TC (tensor_core_2x2) [1,1]|    |
+|   |   +------+  +------+          |     |   +------+  +------+      |    |
+|   |   |  DP  |  |  DP  |          |     |   |  DP  |  |  DP  |      |    |
+|   |   +------+  +------+          |     |   +------+  +------+      |    |
+|   |   +------+  +------+          |     |   +------+  +------+      |    |
+|   |   |  DP  |  |  DP  |          |     |   |  DP  |  |  DP  |      |    |
+|   |   +------+  +------+          |     |   +------+  +------+      |    |
+|   +-------------------------------+     +---------------------------+    |
++--------------------------------------------------------------------------+
+
+  4x4 matrix instantiation:
+
+              Col 0        Col 1        Col 2        Col 3
+           +------------+------------+------------+------------+
+     Row 0 | A00_00     | A00_01     | A01_00     | A01_01     | ---> Tile A00 & A01
+           +------------+------------+------------+------------+
+     Row 1 | A00_10     | A00_11     | A01_10     | A01_11     |
+           +------------+------------+------------+------------+
+     Row 2 | A10_00     | A10_01     | A11_00     | A11_01     | ---> Tile A10 & A11
+           +------------+------------+------------+------------+
+     Row 3 | A10_10     | A10_11     | A11_10     | A11_11     |
+           +------------+------------+------------+------------+
+
+  
+  // Top-Left Tile (A00)
+  T_A00_00 = 8'd...;  T_A00_01 = 8'd...; 
+  T_A00_10 = 8'd...;  T_A00_11 = 8'd...; 
+
+  // Top-Right Tile (A01)
+  T_A01_00 = 8'd...;  T_A01_01 = 8'd...; 
+  T_A01_10 = 8'd...;  T_A01_11 = 8'd...; 
+
+  // Bottom-Left Tile (A10)
+  T_A10_00 = 8'd...;  T_A10_01 = 8'd...; 
+  T_A10_10 = 8'd...;  T_A10_11 = 8'd...; 
+
+  // Bottom-Right Tile (A11)
+  T_A11_00 = 8'd...;  T_A11_01 = 8'd...; 
+  T_A11_10 = 8'd...;  T_A11_11 = 8'd...;
+
+================================================================================
+              CUSTOM PARALLEL ACCELERATOR ISA - USAGE EXAMPLES
+================================================================================
+
+This section provides practical examples of 64-bit instruction words mapped 
+against the ISA format specified above. Each example includes its hex 
+representation, binary breakdown, and field-by-field interpretation.
+
+--------------------------------------------------------------------------------
+1. VECTOR ADDITION (Vector ADD)
+--------------------------------------------------------------------------------
+* Hex Instruction : 2200_0000_0000_0000
+* Binary Breakdown: 001 0001 000 000 0 00000000000000000000000000000000000000000000000000
+
+Field Breakdown:
+  a) EXEC_UNIT  [63:61]: 3'b001 (UNIT_VECTOR_ALU) - Routes data to Vector ALU
+  b) OPCODE     [60:57]: 4'b0001 (VOP_ADD_SUB)     - Selects Add/Sub module
+  c) SUB_OP     [56:54]: 3'b000 (OP_ADD)           - Specifies addition
+  d) SHIFT_POS  [53:51]: 3'b000                    - Not used for additions
+  e) ZERO_BLOCK [50]   : 1'b0                      - Not used for vector ALU
+  f) RESERVED   [49:0] : 50'd0                     - Unused space
+
+--------------------------------------------------------------------------------
+2. LOGICAL OPERATION (Bitwise AND)
+--------------------------------------------------------------------------------
+* Hex Instruction : 2400_0000_0000_0000
+* Binary Breakdown: 001 0010 000 000 0 00000000000000000000000000000000000000000000000000
+
+Field Breakdown:
+  a) EXEC_UNIT  [63:61]: 3'b001 (UNIT_VECTOR_ALU) - Routes data to Vector ALU
+  b) OPCODE     [60:57]: 4'b0010 (VOP_BITWISE)     - Selects Bitwise logic module
+  c) SUB_OP     [56:54]: 3'b000 (BITWISE_AND)      - Specifies bitwise AND operation
+  d) SHIFT_POS  [53:51]: 3'b000                    - Unused
+  e) ZERO_BLOCK [50]   : 1'b0                      - Unused
+  f) RESERVED   [49:0] : 50'd0                     - Unused space
+
+--------------------------------------------------------------------------------
+3. DATA SHIFTING (Shift Left by 2)
+--------------------------------------------------------------------------------
+* Hex Instruction : 2610_0000_0000_0000
+* Binary Breakdown: 001 0011 000 010 0 00000000000000000000000000000000000000000000000000
+
+Field Breakdown:
+  a) EXEC_UNIT  [63:61]: 3'b001 (UNIT_VECTOR_ALU) - Routes data to Vector ALU
+  b) OPCODE     [60:57]: 4'b0011 (VOP_SHIFT)       - Selects Shifting module
+  c) SUB_OP     [56:54]: 3'b000 (SHIFT_LEFT)       - Specifies left shift direction
+  d) SHIFT_POS  [53:51]: 3'b010 (2)                - Shifts data by 2 positions
+  e) ZERO_BLOCK [50]   : 1'b0                      - Unused
+  f) RESERVED   [49:0] : 50'd0                     - Unused space
+
+--------------------------------------------------------------------------------
+4. TENSOR MATRIX MULTIPLICATION (With Zero Blocking ON)
+--------------------------------------------------------------------------------
+* Hex Instruction : 4004_0000_0000_0000
+* Binary Breakdown: 010 0000 000 000 1 00000000000000000000000000000000000000000000000000
+
+Field Breakdown:
+  a) EXEC_UNIT  [63:61]: 3'b010 (UNIT_TENSOR_CORE) - Activates Tensor Core grid
+  b) OPCODE     [60:57]: 4'b0000 (TOP_MATMUL)      - Selects Matrix Multiplication
+  c) SUB_OP     [56:54]: 3'b000                    - Unused
+  d) SHIFT_POS  [53:51]: 3'b000                    - Unused
+  e) ZERO_BLOCK [50]   : 1'b1 (TENSOR_ZB_ON)       - Enables Zero Blocking feature
+  f) RESERVED   [49:0] : 50'd0                     - Unused space
+
+
+******* NOTE ON INSTRUCTION PACKET PADDING (64-bit Word Construction) *******
+--------------------------------------------------------------------------------
+When constructing instructions in Verilog using concatenation, ensure the total 
+width matches 64 bits by padding the remaining reserved space:
+
+instruction_packet = {`EXEC_UNIT, `OPCODE, `SUB_OP, `SHIFT_POS, `ZERO_BLOCK, 50'd0};
+  
+Bits breakdown inside the 64-bit bus:
+  - [63:61] : EXEC_UNIT (3 bits)
+  - [60:57] : OPCODE    (4 bits)
+  - [56:54] : SUB_OP    (3 bits)
+  - [53:51] : SHIFT_POS (3 bits)
+  - [50]    : ZERO_BLOCK(1 bit)
+  - [49:0]  : RESERVED  (50 bits, padded with zeros)
+--------------------------------------------------------------------------------
+

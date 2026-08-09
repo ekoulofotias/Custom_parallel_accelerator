@@ -1,0 +1,22 @@
+read_verilog -sv add_sub_n_bit.v dot_product.v full_add.v hadamard_n_bit.v half_add.v shifting.v tensor_core_2x2.v tensor_grid_4x4.v top_accelerator.v vector_add_sub.v vector_bitwise.v vector_hadamard.v zero_block_detector.v
+
+hierarchy -top top_accelerator
+
+proc; opt
+
+show -format png -prefix add_sub_n_bit_sch -notitle add_sub_n_bit
+show -format png -prefix dot_product_sch -notitle dot_product
+show -format png -prefix full_add_sch -notitle full_add
+show -format png -prefix hadamard_n_bit_sch -notitle hadamard_n_bit
+show -format png -prefix half_add_sch -notitle half_add
+show -format png -prefix shifting_sch -notitle shifting
+show -format png -prefix tensor_core_2x2_sch -notitle tensor_core_2x2
+show -format png -prefix tensor_grid_4x4_sch -notitle tensor_grid_4x4
+show -format png -prefix vector_add_sub_sch -notitle vector_add_sub
+show -format png -prefix vector_alu_sch -notitle vector_alu
+show -format png -prefix vector_bitwise_sch -notitle vector_bitwise
+show -format png -prefix vector_hadamard_sch -notitle vector_hadamard
+show -format png -prefix zero_block_detector_sch -notitle zero_block_detector
+show -format png -prefix top_accelerator_sch -notitle top_accelerator
+
+# PERMISSION NEEDED chmod +x generate_schematics.ys
