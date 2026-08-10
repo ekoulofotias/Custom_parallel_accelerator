@@ -109,6 +109,8 @@ The testbench demonstrates:
 - Dot product computation
 - 4×4 matrix multiplication with tensor cores
 
+This testbench can be easily modified to demonstrate other operations.
+
 ---
 
 ## License
