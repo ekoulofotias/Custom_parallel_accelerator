@@ -89,8 +89,9 @@ Custom_parallel_accelerator
 ## How to Simulate
 
 ### Requirements
-- Verilog simulator (e.g. Icarus Verilog)
+- Icarus Verilog (or another Verilog compiler)
 - (Optional) Yosys for synthesis, system statistics and schematics generation
+- (Optional) GTKWave for viewing waveforms as .vcd files
 
 ### Running the Testbench
 
@@ -102,6 +103,16 @@ Custom_parallel_accelerator
 # Run simulation
 
         vvp tb
+```
+### Running the Yosys Scripts
+
+```bash
+        yosys <script_name>.ys
+```
+### Viewing the waveforms
+
+```bash
+        gtkwave tb.vcd
 ```
 
 The testbench demonstrates:
