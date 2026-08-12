@@ -58,7 +58,7 @@ module tb_accelerator;
     initial begin
 
         $dumpfile("tb.vcd");
-        $dumpvars(0, tb);
+        $dumpvars(0, tb_accelerator);
         
         clk = 0;
         rst = 1;
