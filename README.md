@@ -90,7 +90,7 @@ Custom_parallel_accelerator
 
 ### Requirements
 - Verilog simulator (e.g. Icarus Verilog)
-- (Optional) Yosys for synthesis and system statistics
+- (Optional) Yosys for synthesis, system statistics and schematics generation
 
 ### Running the Testbench
 
@@ -109,7 +109,9 @@ The testbench demonstrates:
 - Dot product computation
 - 4×4 matrix multiplication with tensor cores
 
-This testbench can be easily modified to demonstrate other operations.
+**Note**
+
+This testbench can be easily customized to support further functionalities. I highly recommend experimenting with other operations by providing the appropriate opcode (see `Custom_parallel_accelerator_Manual.txt`) and any other necesary modifications.
 
 ---
 
