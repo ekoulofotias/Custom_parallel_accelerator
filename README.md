@@ -124,6 +124,41 @@ The testbench demonstrates:
 
 This testbench can be easily customized to support further functionalities. I highly recommend experimenting with other operations by providing the appropriate opcode (see `Custom_parallel_accelerator_Manual.txt`) and any other necesary modifications.
 
+### Output example
+
+```bash
+VCD info: dumpfile tb.vcd opened for output.
+Vector ALU test result:
+----------------------------------------
+A + B = C
+A = ( 1, 4, 15, 3, 10, 8, 0, 1 )
+B = ( 6, 2, 15, 2, 1, 10, 12, 2 )
+C = ( 7, 6, 30, 5, 11, 18, 12, 3 )
+----------------------------------------
+Dot Product test result:
+----------------------------------------
+A . B = 337
+----------------------------------------
+Matrix Multiplication Result:
+----------------------------------------
+A x B = C
+      ┌  1   1   1   1┐
+  A = |  0   1   0   1|
+      |  1   0   1   0|
+      └  1   1   0   0┘
+----------------------------------------
+      ┌  2   0   1   1┐
+  B = |  0   2   1   0|
+      |  1   1   2   0|
+      └  2   0   0   2┘
+----------------------------------------
+      ┌  5   3   4   3┐
+  C = |  2   2   1   2|
+      |  3   1   3   1|
+      └  2   2   2   1┘
+tb.v:223: $finish called at 115 (1s)
+```
+
 ---
 
 ## License
