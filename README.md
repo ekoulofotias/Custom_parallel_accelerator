@@ -81,8 +81,17 @@ Custom_parallel_accelerator
 ├── Custom_parallel_accelerator_Manual.txt # ISA manual & architecture guide
 │
 ├── yosys_tests.ys                         # Yosys synthesis script
-└── generate_schematics.ys                 # Schematic generation script
+├── generate_schematics.ys                 # Schematic generation script
+│
+└── zero_blocking_evaluation.pdf           # Performance & Power Evaluation
 ```
+
+---
+
+## Performance & Power Evaluation
+For a detailed breakdown of the hardware evaluation, check out the `zero_blocking_evaluation.pdf`.
+* **Core Metric:** Τracking **switching activity (toggling)** extracted from VCD simulation files as a direct indicator of **dynamic power consumption**. 
+* **Key Findings:** The zero-blocking optimization successfully reduces switching activity by up to 14% in sparse configurations, proving its effectiveness in lowering dynamic power dissipation.
 
 ---
 
