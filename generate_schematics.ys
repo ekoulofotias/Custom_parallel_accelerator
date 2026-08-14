@@ -1,8 +1,7 @@
-read_verilog -sv add_sub_n_bit.v dot_product.v full_add.v hadamard_n_bit.v half_add.v shifting.v tensor_core_2x2.v tensor_grid_4x4.v top_accelerator.v vector_add_sub.v vector_bitwise.v vector_hadamard.v zero_block_detector.v
+read_verilog -sv add_sub_n_bit.v dot_product.v full_add.v hadamard_n_bit.v half_add.v shifting.v tensor_core_2x2.v tensor_grid_4x4.v top_accelerator.v vector_add_sub.v vector_alu.v vector_bitwise.v vector_hadamard.v zero_block_detector.v
 
-hierarchy -top top_accelerator
-
-proc; opt
+hierarchy -check
+proc
 
 show -format png -prefix add_sub_n_bit_sch -notitle add_sub_n_bit
 show -format png -prefix dot_product_sch -notitle dot_product
