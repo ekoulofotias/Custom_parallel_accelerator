@@ -28,7 +28,9 @@ The system is based on a **top-down modular architecture**, combining specialize
 
 ### Tensor Cores
 <img src="tensor_grid_4x4_sch.png" alt="Tensor Grid" align="left" width="40%" style="margin-right: 20px;"/>
+
 `tensor_grid_4x4.v` & `tensor_core_2x2.v`
+
 - Structured grid of four 2×2 tensor cores
 - Hardware-accelerated 4×4 matrix multiplications
 - Block matrix multiplication algorithm with 2-stage pipelined execution
@@ -37,7 +39,9 @@ The system is based on a **top-down modular architecture**, combining specialize
 
 ### Vector ALU
 <img src="vector_alu_sch.png" alt="Vector ALU" align="right" width="40%" style="margin-left: 20px;"/>
+
 `vector_alu.v`
+
 - Parallel vector operations on 64-bit vectors (8 × 8-bit elements)
 - **Operations:** Addition/Subtraction, Bitwise (AND, OR, XOR, NOT, NAND, NOR, XNOR), Shifting, Hadamard product, Dot product
 - Carry and overflow flag generation
