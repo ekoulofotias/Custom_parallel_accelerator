@@ -8,6 +8,7 @@
 
 ## Overview
 
+<img src="top_accelerator_sch.png" alt="Top Accelerator" align="right" width="45%" style="margin-left: 20px;"/>
 A custom hardware parallel accelerator architecture written in **Verilog**, designed from scratch with a focus on demonstrating modern GPU core concepts. This project features:
 
 - **4×4 Tensor Core Grid** — Hardware-accelerated matrix multiplication via block matrix multiplication algorithm
@@ -17,6 +18,7 @@ A custom hardware parallel accelerator architecture written in **Verilog**, desi
 - **Full RTL Design** — Comprehensive testbenches, synthesis scripts, and documentation
 
 This is an **educational proof-of-concept** demonstrating the fundamental principles of modern parallel accelerator architecture (similar to NVIDIA/AMD GPU design).
+<br clear="right"/>
 
 ---
 
@@ -25,17 +27,21 @@ This is an **educational proof-of-concept** demonstrating the fundamental princi
 The system is based on a **top-down modular architecture**, combining specialized units:
 
 ### Tensor Cores
+<img src="tensor_grid_4x4_sch.png" alt="Tensor Grid" align="left" width="40%" style="margin-right: 20px;"/>
 `tensor_grid_4x4.v` & `tensor_core_2x2.v`
 - Structured grid of four 2×2 tensor cores
 - Hardware-accelerated 4×4 matrix multiplications
 - Block matrix multiplication algorithm with 2-stage pipelined execution
 - Programmable zero-block skipping for power efficiency
+<br clear="left"/>
 
 ### Vector ALU
+<img src="vector_alu_sch.png" alt="Vector ALU" align="right" width="40%" style="margin-left: 20px;"/>
 `vector_alu.v`
 - Parallel vector operations on 64-bit vectors (8 × 8-bit elements)
 - **Operations:** Addition/Subtraction, Bitwise (AND, OR, XOR, NOT, NAND, NOR, XNOR), Shifting, Hadamard product, Dot product
 - Carry and overflow flag generation
+<br clear="right"/>
 
 ### Zero Block Detector
 `zero_block_detector.v`
