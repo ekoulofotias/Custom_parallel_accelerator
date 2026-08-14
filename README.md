@@ -38,14 +38,13 @@ The system is based on a **top-down modular architecture**, combining specialize
 <br clear="left"/>
 
 ### Vector ALU
-<img src="vector_alu_sch.png" alt="Vector ALU" align="right" width="40%" style="margin-left: 20px;"/>
-
 `vector_alu.v`
-
 - Parallel vector operations on 64-bit vectors (8 × 8-bit elements)
 - **Operations:** Addition/Subtraction, Bitwise (AND, OR, XOR, NOT, NAND, NOR, XNOR), Shifting, Hadamard product, Dot product
 - Carry and overflow flag generation
-<br clear="right"/>
+<p align="center">
+  <img src="vector_alu_sch.png" alt="Vector ALU Schematic" width="85%"/>
+</p>
 
 ### Zero Block Detector
 `zero_block_detector.v`
