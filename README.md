@@ -9,7 +9,7 @@
 ## Overview
 
 <img src="top_accelerator_sch.png" alt="Top Accelerator" align="right" width="45%" style="margin-left: 20px;"/>
-A custom hardware parallel accelerator architecture written in **Verilog**, designed from scratch with a focus on demonstrating modern GPU core concepts. This project features:
+A custom hardware parallel accelerator architecture written in **Verilog** , designed from scratch with a focus on demonstrating modern GPU core concepts. This project features:
 
 - **4×4 Tensor Core Grid** — Hardware-accelerated matrix multiplication via block matrix multiplication algorithm
 - **Vector ALU** — Parallel vector operations (addition, subtraction, bitwise logic, shifts, Hadamard product, dot product)
