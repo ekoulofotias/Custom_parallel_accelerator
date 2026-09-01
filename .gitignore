@@ -1,0 +1,34 @@
+# Verilog Simulation
+*.vvp
+*.vcd
+*.fst
+*.ghw
+
+# Compilation outputs
+*.o
+*.out
+*.sim
+
+# Build directories
+build/
+sim/
+work/
+obj/
+
+# Yosys synthesis outputs
+*.json
+*.rtl
+*.abc
+*.blif
+
+# IDE/Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS
+Thumbs.db
+*.log

@@ -1,0 +1,22 @@
+read_verilog -sv block_top.v dot_product.v tensor_grid_4x4.v vector_add_sub.v vector_bitwise.v zero_block_detector.v core_wrapper.v shifting.v tensor_core_2x2.v top_accelerator.v vector_alu.v vector_hadamard.v
+
+proc; opt; techmap; opt
+
+abc -lut 6
+
+log =================================================
+log ============== HARDWARE STATISTICS ==============
+log =================================================
+stat 
+log =================================================
+
+flatten
+log =================================================
+log ============ LONGEST TOPOLOGICAL PATH ===========
+log =================================================
+ltp
+
+log =================================================
+log ====================== NOTE =====================
+log =================================================
+log This test was executed assuming an LUT of 6.
