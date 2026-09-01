@@ -18,7 +18,7 @@ A custom hardware parallel accelerator architecture written in **Verilog**, desi
 - **Custom 16-bit ISA** — Highly optimized, dense instruction set architecture with field-level control
 - **Full RTL Design** — Comprehensive testbenches, synthesis scripts, and documentation
 
-This is an **educational proof-of-concept** demonstrating the fundamental principles of modern parallel accelerator architecture (similar to NVIDIA/AMD/TPU design).
+This is an **educational proof-of-concept** demonstrating the fundamental principles of modern parallel accelerator architecture (similar to NVIDIA/AMD design).
 <br clear="right"/>
 
 ---
@@ -171,17 +171,17 @@ TEST 4: Signed Tensor MAC Result (A x B + C = D)
      |   2    0    1    2|
      └   1   -4    3    1┘
 ----------------------------------------
-     ┌   -10     10      0      3┐
-  C =|     5     -2      4      1|
-     |   -16      2      2     -6|
-     └     1      5      3      0┘
+     ┌ -10   10    0    3┐
+  C =|   5   -2    4    1|
+     | -16    2    2   -6|
+     └   1    5    3    0┘
 ----------------------------------------
-     ┌    -9     15     -3      5┐
-  D =|    11     11     -5      4|
-     |   -14    -11     14     -5|
-     └     7     -5      8      4┘
+     ┌  -9   15   -3    5┐
+  D =|  11   11   -5    4|
+     | -14  -11   14   -5|
+     └   7   -5    8    4┘
 ----------------------------------------
-tb.v:197: $finish called at 135 (1s)
+tb.v:224: $finish called at 135 (1s)
 ```
 
 ---

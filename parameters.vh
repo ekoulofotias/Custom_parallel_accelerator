@@ -41,14 +41,6 @@
 `define TENSOR_ZB_OFF    1'b0
 `define TENSOR_ZB_ON     1'b1
 
-// BLOCK DIMENSIONS
-`define BLOCK_ROW_DIM    2
-`define BLOCK_COL_DIM    2
-
-// GRID DIMENSIONS
-`define GRID_ROW_DIM     2
-`define GRID_COL_DIM     2
-
 `endif
 `endif
 

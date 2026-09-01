@@ -6,13 +6,13 @@ proc
 show -format png -prefix dot_product_sch -notitle dot_product
 show -format png -prefix shifting_sch -notitle shifting
 show -format png -prefix tensor_core_2x2_sch -notitle tensor_core_2x2
-show -format png -prefix tensor_grid_4x4_sch -notitle tensor_grid_4x4
 show -format png -prefix vector_add_sub_sch -notitle vector_add_sub
-show -format png -prefix vector_alu_sch -notitle vector_alu
 show -format png -prefix vector_bitwise_sch -notitle vector_bitwise
 show -format png -prefix vector_hadamard_sch -notitle vector_hadamard
 show -format png -prefix zero_block_detector_sch -notitle zero_block_detector
 show -format png -prefix top_accelerator_sch -notitle top_accelerator
+show -format png -prefix tensor_grid_4x4_sch -notitle tensor_grid_4x4
+show -format png -prefix vector_alu_sch -notitle vector_alu
 
 
 # PERMISSION NEEDED chmod +x generate_schematics.ys
