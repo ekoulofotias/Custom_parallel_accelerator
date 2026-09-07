@@ -10,15 +10,16 @@
 
 <img src="top_accelerator_sch.png" alt="Top Accelerator" align="right" width="45%" style="margin-left: 20px;"/>
 
-A custom hardware parallel accelerator architecture written in **Verilog**, designed from scratch with a focus on demonstrating modern GPU core concepts. This project features:
+A custom hardware parallel accelerator architecture written in **Verilog**, designed from scratch to demonstrate modern GPU core concepts. This project features:
 
-- **4×4 Tensor Core Grid** — Hardware-accelerated matrix multiplication with MAC support ($A \times B + C$) via block matrix multiplication algorithm
-- **Vector ALU** — Parallel vector operations (addition, bitwise logic, shifts, Hadamard product, dot product)
-- **Zero-Block Detection** — Power optimization mechanism for sparse computations
-- **Custom 16-bit ISA** — Highly optimized, dense instruction set architecture with field-level control
-- **Full RTL Design** — Comprehensive testbenches, synthesis scripts, and documentation
+- **4×4 Tensor Core Grid** — Hardware-accelerated matrix multiplication with MAC support ($A \times B + C$) via a block matrix multiplication algorithm.
+- **Vector ALU** — Parallel vector operations (addition, bitwise logic, shifts, Hadamard product, dot product).
+- **Zero-Block Detection & Gating** — Dynamic input/clock gating mechanism for sparse matrix multiplication power optimization.
+- **IEEE VPI Activity Tracking** — Integrated C-based VPI module (`activity.c`) for accurate, isolated netlist switching activity (toggling) measurements.
+- **Custom 16-bit ISA** — Highly optimized instruction set architecture with field-level control.
+- **Full RTL & Makefile Automation** — Modular testbenches, automated Make targets, synthesis scripts, and schematics.
 
-This is an **educational proof-of-concept** demonstrating the fundamental principles of modern parallel accelerator architecture (similar to NVIDIA/AMD design).
+This is an **educational proof-of-concept** demonstrating the fundamental principles of modern parallel accelerator architecture (similar to NVIDIA/AMD Tensor architectures).
 <br clear="right"/>
 
 ---
@@ -32,30 +33,31 @@ The system is based on a **top-down modular architecture**, combining specialize
 
 `tensor_grid_4x4.v` & `tensor_core_2x2.v`
 
-- Structured grid of four 2×2 tensor cores
-- Hardware-accelerated 4×4 matrix multiply-accumulate operations (MAC)
-- Block matrix multiplication algorithm with 2-stage pipelined execution
-- Programmable zero-block skipping for power efficiency
+- Structured grid of four 2×2 tensor cores.
+- Hardware-accelerated 4×4 matrix multiply-accumulate operations (MAC).
+- Block matrix multiplication algorithm with 2-stage execution.
+- Integrated zero-block logic gating for dynamic power reduction.
 <br clear="left"/>
 
 ### Vector ALU
 `vector_alu.v`
-- Parallel vector operations on 64-bit vectors (8 × 8-bit elements)
-- **Operations:** Addition (Subtraction is software-driven via Two's Complement), Bitwise (AND, OR, XOR, NOT, NAND, NOR, XNOR), Shifting, Hadamard product, Dot product
-- Hardware-optimized inference mapping
+- Parallel vector operations on 64-bit vectors (8 × 8-bit elements).
+- **Operations:** Addition (Subtraction via Two's Complement), Bitwise (AND, OR, XOR, NOT, NAND, NOR, XNOR), Shifting, Hadamard product, Dot product.
 <p align="center">
   <img src="vector_alu_sch.png" alt="Vector ALU Schematic" width="85%"/>
 </p>
 
 ### Zero Block Detector
 `zero_block_detector.v`
-- Detects all-zero blocks in input matrices
-- Enables pipeline bypass for energy efficiency
-- Critical for sparse matrix acceleration
+- Detects all-zero $2\times 2$ blocks in input matrices.
+- Gates internal multiplier/accumulator activity while preserving mathematical accuracy.
+- Critical for sparse matrix multiplication energy efficiency.
 
-### Arithmetic Foundation
-- Native Two's Complement signed arithmetic
-- RTL-inferred adders and multipliers optimized for standard DSP / LUT mapping
+### IEEE VPI Activity Monitor
+`activity.c`
+- C-based Verilog Procedural Interface (VPI) module loaded at simulation runtime.
+- Tracks exact netlist value changes (toggles) per instruction step.
+- Eliminates testbench background noise to reflect true silicon dynamic power efficiency.
 
 ---
 
@@ -63,61 +65,75 @@ The system is based on a **top-down modular architecture**, combining specialize
 
 ```text
 Custom_parallel_accelerator
-├── README.md                              # This file
-├── LICENSE                                # MIT License
-├── .gitignore                             # Git ignore rules
+├── README.md                                # Project documentation
+├── LICENSE                                  # MIT License
+├── makefile                                 # Build & simulation automation
+├── parameters.vh                            # Global parameters & ISA definitions
 │
-├── parameters.vh                          # Global parameters & ISA definitions
-├── top_accelerator.v                      # Top-level module integration
+├── top_accelerator.v                        # Top-level accelerator module
+├── tensor_grid_4x4.v                        # 4×4 Tensor Core grid
+├── tensor_core_2x2.v                        # 2×2 Tensor Core building block
+├── vector_alu.v                             # Vector ALU dispatcher
+├── vector_add_sub.v                         # Vector addition/subtraction unit
+├── vector_bitwise.v                         # Vector bitwise operations unit
+├── vector_hadamard.v                        # Hadamard product unit
+├── shifting.v                               # Barrel shifter
+├── dot_product.v                            # Dot product unit
+├── zero_block_detector.v                    # Zero-block detection & gating logic
 │
-├── tensor_grid_4x4.v                      # 4×4 Tensor Core grid
-├── tensor_core_2x2.v                      # Basic 2×2 Tensor Core building block
+├── activity.c                               # C-based IEEE VPI activity monitor
+├── tb.v                                     # Functional verification testbench
+├── zero_block_eval_tb.v                     # Zero-blocking power evaluation testbench
 │
-├── vector_alu.v                           # Vector ALU dispatcher
-├── vector_add_sub.v                       # Vector addition
-├── vector_bitwise.v                       # Vector bitwise operations
-├── vector_hadamard.v                      # Hadamard product
-├── shifting.v                             # Barrel shifter
+├── Custom_parallel_accelerator_Manual.txt   # ISA manual & architecture guide
+├── yosys_tests.ys                           # Yosys synthesis script
+├── generate_schematics.ys                   # Schematic generation script
 │
-├── dot_product.v                          # Dot product unit
-├── zero_block_detector.v                  # Zero-block detection logic
-│
-├── tb.v                                   # Comprehensive testbench
-│
-├── Custom_parallel_accelerator_Manual.txt # ISA manual & architecture guide
-│
-├── yosys_tests.ys                         # Yosys synthesis script
-├── generate_schematics.ys                 # Schematic generation script
-│
-└── zero_blocking_evaluation.pdf           # Performance & Power Evaluation
+└── zero_blocking_evaluation.pdf             # Performance & Power Evaluation
 ```
 
 ---
 
 ## Performance & Power Evaluation
-For a detailed breakdown of the hardware evaluation, check out the `zero_blocking_evaluation.pdf`.
-* **Core Metric:** Τracking **switching activity (toggling)** extracted from VCD simulation files as a direct indicator of **dynamic power consumption**.
-* **Key Findings:** The zero-blocking optimization successfully reduces switching activity by up to 14% in sparse configurations, proving its effectiveness in lowering dynamic power dissipation.
+
+Hardware power efficiency is evaluated using an **IEEE VPI activity monitor** (`activity.c`), which tracks logic-level switching activity strictly during active instruction execution.
+
+- **Dynamic Power Reduction:** The zero-blocking optimization successfully reduces dynamic switching activity by up to **45%** in high-sparsity matrix workloads (75% zero tiles).
+- **Architectural Trade-off:** At low sparsity (25%), a minor ~5% control logic overhead is observed due to zero-detection circuitry, which is quickly offset as matrix sparsity increases.
+- **Detailed Evaluation:** For the complete experimental setup, hardware trade-offs, and methodology breakdown, refer to `zero_blocking_evaluation.pdf`.
 
 ---
 
 ## How to Simulate
 
 ### Requirements
-- Icarus Verilog (or another Verilog compiler)
-- (Optional) Yosys for synthesis, system statistics and schematics generation
-- (Optional) GTKWave for viewing waveforms as .vcd files
+- Icarus Verilog (iverilog, vvp, iverilog-vpi)
+- GNU Make
+- (Optional) GTKWave for viewing .vcd waveform traces
+- (Optional) Yosys for synthesis and schematic generation
 
-### Running the Testbench
+### Commands
 
 ```bash
-# Using Icarus Verilog:
+# Functional Demo : A full instruction verification deontstrating
+# - Signed vector addition & arithmetic
+# - Dot product computation
+# - Vector shift & bitwise operations
+# - 4×4 Signed Matrix MAC (Multiply-Accumulate) with tensor cores
 
-iverilog -o tb *.v
+make demo
 
-# Run simulation
+# Power & Activity Evaluation :
+# - Compiles the C VPI module
+# - Runs the dedicated benchmark testbench
+# - Outputs exact toggle counts
 
-vvp tb
+make eval
+
+# Build cleaning
+
+make clean
+
 ```
 ### Running the Yosys Scripts
 
@@ -127,22 +143,13 @@ yosys <script_name>.ys
 ### Viewing the waveforms
 
 ```bash
-gtkwave tb.vcd
+gtkwave <tb_name>.vcd
 ```
-
-The testbench demonstrates:
-- Signed vector addition & arithmetic
-- Dot product computation
-- Vector shift & bitwise operations
-- 4×4 Signed Matrix MAC (Multiply-Accumulate) with tensor cores
-
-**Note**
-
-This testbench can be easily customized to support further functionalities. I highly recommend experimenting with other operations by providing the appropriate opcode (see `Custom_parallel_accelerator_Manual.txt`) and any other necesary modifications.
 
 ### Output example
 
 ```bash
+# Functional Demo
 VCD info: dumpfile tb.vcd opened for output.
 ========================================
 TEST 1: Signed Vector Addition (A + B)
@@ -181,9 +188,106 @@ TEST 4: Signed Tensor MAC Result (A x B + C = D)
      | -14  -11   14   -5|
      └   7   -5    8    4┘
 ----------------------------------------
-tb.v:224: $finish called at 135 (1s)
-```
+tb.v:225: $finish called at 135 (1s)
 
+# Power & Activity Evaluation
+VCD info: dumpfile tb_tensor.vcd opened for output.
+SWITCHING ACTIVITY: 497 Toggles
+TEST 1: Signed Tensor MAC Result (A x B + C = D)
+----------------------------------------
+     ┌   2   -1    1    0┐
+  A =|  -2    3    2   -5|
+     |  -4    1    1    1|
+     └   0    2   -1    2┘
+----------------------------------------
+     ┌   1    2   -2    1┐
+  B =|   3   -1    0    2|
+     |   2    0    1    2|
+     └   1   -4    3    1┘
+----------------------------------------
+     ┌ -10   10    0    3┐
+  C =|   5   -2    4    1|
+     | -16    2    2   -6|
+     └   1    5    3    0┘
+----------------------------------------
+     ┌  -9   15   -3    5┐
+  D =|  11   11   -5    4|
+     | -14  -11   14   -5|
+     └   7   -5    8    4┘
+----------------------------------------
+SWITCHING ACTIVITY: 1106 Toggles
+TEST 2: Zero Blocking ON - Matrix A with 1 Zero-Tile (A00)
+----------------------------------------
+     ┌   0    0    2    1┐
+  A =|   0    0    3   -2|
+     |   1    4   -3    2|
+     └   2    1    1    3┘
+----------------------------------------
+     ┌   2    1    1    2┐
+  B =|  -2    3    0    1|
+     |   3   -3    1    0|
+     └   1    2   -2    1┘
+----------------------------------------
+     ┌   0    0    0    0┐
+  C =|   0    0    0    0|
+     |   0    0    0    0|
+     └   0    0    0    0┘
+----------------------------------------
+     ┌   7   -4    0    1┐
+  D =|   7  -13    7   -2|
+     | -13   26   -6    8|
+     └   8    8   -3    8┘
+----------------------------------------
+SWITCHING ACTIVITY: 1746 Toggles
+TEST 3: Zero Blocking ON - Matrix A with 2 Zero-Tiles (A00, A01)
+----------------------------------------
+     ┌   0    0    0    0┐
+  A =|   0    0    0    0|
+     |   2    1    1    2|
+     └  -2    3    4   -3┘
+----------------------------------------
+     ┌   2    1    1    2┐
+  B =|  -2    3    0    1|
+     |   3   -3    1    0|
+     └   1    2   -2    1┘
+----------------------------------------
+     ┌   0    0    0    0┐
+  C =|   0    0    0    0|
+     |   0    0    0    0|
+     └   0    0    0    0┘
+----------------------------------------
+     ┌   0    0    0    0┐
+  D =|   0    0    0    0|
+     |   7    6   -1    7|
+     └  -1  -11    8   -4┘
+----------------------------------------
+SWITCHING ACTIVITY: 2149 Toggles
+TEST 4: Zero Blocking ON - Matrix A with 3 Zero-Tiles (A00, A01, A10)
+----------------------------------------
+     ┌   0    0    0    0┐
+  A =|   0    0    0    0|
+     |   0    0    3    2|
+     └   0    0   -2    1┘
+----------------------------------------
+     ┌   2    1    1    2┐
+  B =|  -2    3    0    1|
+     |   3   -3    1    0|
+     └   1    2   -2    1┘
+----------------------------------------
+     ┌   0    0    0    0┐
+  C =|   0    0    0    0|
+     |   0    0    0    0|
+     └   0    0    0    0┘
+----------------------------------------
+     ┌   0    0    0    0┐
+  D =|   0    0    0    0|
+     |  11   -5   -1    2|
+     └  -5    8   -4    1┘
+----------------------------------------
+SWITCHING ACTIVITY: 2484 Toggles
+zero_block_eval_tb.v:280: $finish called at 195 (1s)
+
+```
 ---
 
 ## License

@@ -72,7 +72,6 @@ module tb_accelerator;
 		rst = 1;
 		instruction_in = 16'b0;
 
-
 		// TEST 1: SIGNED VECTOR ADDITION
 		vec_a_in = {8'h0A, 8'hFB, 8'h0F, 8'hF6, 8'h03, 8'h08, 8'h80, 8'h01};
 		vec_b_in = {8'h05, 8'h05, 8'hFB, 8'h0A, 8'h02, 8'hFE, 8'h01, 8'h02};
@@ -122,9 +121,8 @@ module tb_accelerator;
 		$display("A . B = %0d", $signed(dot_out));
 		$display("----------------------------------------");
 
-		// ==========================================
 		// TEST 3: BITWISE & SHIFT CHECKS
-		// ==========================================
+
 		#10;
 		instruction_in = 16'h2610; // Shift Left by 2
 		#10;
@@ -133,9 +131,8 @@ module tb_accelerator;
 		$display("Shifted OUT[5] = %0d", $signed(vec_alu_out[5*`BIT_SIZE +: `BIT_SIZE]));
 		$display("----------------------------------------");
 
-		// ==========================================
 		// TEST 4: TENSOR MAC WITH SIGNED MATRICES & NEGATIVE BIAS
-		// ==========================================
+
 		@(posedge clk);
 	
 		// Matrix A
@@ -192,7 +189,9 @@ module tb_accelerator;
 		T_C11_10 = 16'h0003;
 		T_C11_11 = 16'h0000;
 
+		#10;
 		instruction_in = 16'h4000; // UNIT_TENSOR_CORE + MATMUL
+		#10;
 
 		@(posedge clk);
 		@(posedge clk);
@@ -221,8 +220,9 @@ module tb_accelerator;
 		$display("     └%4d %4d %4d %4d┘", $signed(T_D10_10), $signed(T_D10_11), $signed(T_D11_10), $signed(T_D11_11));
 		$display("----------------------------------------");
 
-		#20 $finish;
+		#10;
+	
+		$finish;
 	end
 
 endmodule
-
