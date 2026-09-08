@@ -99,7 +99,6 @@ Custom_parallel_accelerator
 Hardware power efficiency is evaluated using an **IEEE VPI activity monitor** (`activity.c`), which tracks logic-level switching activity strictly during active instruction execution.
 
 - **Dynamic Power Reduction:** The zero-blocking optimization successfully reduces dynamic switching activity by up to **45%** in high-sparsity matrix workloads (75% zero tiles).
-- **Architectural Trade-off:** At low sparsity (25%), a minor ~5% control logic overhead is observed due to zero-detection circuitry, which is quickly offset as matrix sparsity increases.
 - **Detailed Evaluation:** For the complete experimental setup, hardware trade-offs, and methodology breakdown, refer to `zero_blocking_evaluation.pdf`.
 
 ---
