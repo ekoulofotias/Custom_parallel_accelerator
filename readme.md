@@ -12,7 +12,7 @@
 
 A custom hardware parallel accelerator architecture written in **Verilog**, designed from scratch to demonstrate modern GPU core concepts. This project features:
 
-- **4×4 Tensor Core Grid** — Hardware-accelerated matrix multiplication with MAC support ($A \times B + C$) via a block matrix multiplication algorithm.
+- **4×4 Tensor Core Grid** — Hardware-accelerated matrix multiplication with MAC support (A×B+C) via a block matrix multiplication algorithm.
 - **Vector ALU** — Parallel vector operations (addition, bitwise logic, shifts, Hadamard product, dot product).
 - **Zero-Block Detection & Gating** — Dynamic input/clock gating mechanism for sparse matrix multiplication power optimization.
 - **IEEE VPI Activity Tracking** — Integrated C-based VPI module (`activity.c`) for accurate, isolated netlist switching activity (toggling) measurements.
