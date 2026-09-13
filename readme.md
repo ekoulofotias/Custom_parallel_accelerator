@@ -164,12 +164,10 @@ gtkwave <tb_name>.vcd
 
 ```bash
 # Functional Demo
-VCD info: dumpfile tb.vcd opened for output.
+VCD info: dumpfile tb_system.vcd opened for output.
 ========================================
 TEST 1: Signed Vector Addition (A + B)
 ----------------------------------------
-A[7..0] = (10, -5, 15, -10, 3, 8, -128, 1)
-B[7..0] = (5, 5, -5, 10, 2, -2, 1, 2)
 OUT     = (15, 0, 10, 0, 5, 6, -127, 3)
 ----------------------------------------
 TEST 2: Signed Dot Product (A . B)
@@ -197,12 +195,12 @@ TEST 4: Signed Tensor MAC Result (A x B + C = D)
      | -16    2    2   -6|
      └   1    5    3    0┘
 ----------------------------------------
-     ┌  -9   15   -3    5┐
-  D =|  11   11   -5    4|
-     | -14  -11   14   -5|
-     └   7   -5    8    4┘
+     ┌   4    5    1    3┐
+  D =|  11   11   -7   -3|
+     |   3   -8   12    4|
+     └ -10   -8    5    2┘
 ----------------------------------------
-tb.v:225: $finish called at 135 (1s)
+tb.v:224: $finish called at 345 (1s)
 
 # Power & Activity Evaluation
 VCD info: dumpfile tb_tensor.vcd opened for output.
