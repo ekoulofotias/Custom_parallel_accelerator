@@ -12,7 +12,7 @@
 
 A custom hardware parallel accelerator architecture written in **Verilog**, designed from scratch to demonstrate modern GPU core concepts. This project features:
 
-- **4×4 Tensor Core Grid** — Hardware-accelerated matrix multiplication with MAC support (A×B+C) via a block matrix multiplication algorithm.
+- **4×4 Tensor Core Grid** — Hardware-accelerated matrix multiplication with MAC support ($A \times B + C$) via a block matrix multiplication algorithm.
 - **Vector ALU** — Parallel vector operations (addition, bitwise logic, shifts, Hadamard product, dot product).
 - **Zero-Block Detection & Gating** — Dynamic input/clock gating mechanism for sparse matrix multiplication power optimization.
 - **IEEE VPI Activity Tracking** — Integrated C-based VPI module (`activity.c`) for accurate, isolated netlist switching activity (toggling) measurements.
@@ -27,6 +27,12 @@ This is an **educational proof-of-concept** demonstrating the fundamental princi
 ## Key Features & Architecture
 
 The system is based on a **top-down modular architecture**, combining specialized units:
+
+### 32-bit Streaming Datapath (`top_system.v`)
+To bridge narrow external buses with wide internal registers, the system uses an organized streaming structure:
+- **`top_driver.v` (Data Manager):** Manages the shared 32-bit bus and routes data based on `target_sel` signals.
+- **Matrix & Vector Drivers (`matrix_driver.v`, `vector_driver.v`):** Deserializers that accumulate 32-bit slices into 64-bit vectors, 128-bit matrices (A, B), or 256-bit matrices (C).
+- **`accelerator_connector.v` (Slicing Unit):** Maps unified internal registers precisely to the individual input pins of the accelerator core.
 
 ### Tensor Cores
 <img src="tensor_grid_4x4_sch.png" alt="Tensor Grid" align="left" width="40%" style="margin-right: 20px;"/>
@@ -65,31 +71,38 @@ The system is based on a **top-down modular architecture**, combining specialize
 
 ```text
 Custom_parallel_accelerator
-├── README.md                                # Project documentation
-├── LICENSE                                  # MIT License
-├── makefile                                 # Build & simulation automation
-├── parameters.vh                            # Global parameters & ISA definitions
+├── README.md                              # Project documentation
+├── LICENSE                                # MIT License
+├── makefile                               # Build & simulation automation
+├── parameters.vh                          # Global parameters & ISA definitions
 │
-├── top_accelerator.v                        # Top-level accelerator module
-├── tensor_grid_4x4.v                        # 4×4 Tensor Core grid
-├── tensor_core_2x2.v                        # 2×2 Tensor Core building block
-├── vector_alu.v                             # Vector ALU dispatcher
-├── vector_add_sub.v                         # Vector addition/subtraction unit
-├── vector_bitwise.v                         # Vector bitwise operations unit
-├── vector_hadamard.v                        # Hadamard product unit
-├── shifting.v                               # Barrel shifter
-├── dot_product.v                            # Dot product unit
-├── zero_block_detector.v                    # Zero-block detection & gating logic
+├── top_system.v                           # Unified streaming wrapper (Bus + Drivers + Core)
+├── top_accelerator.v                      # Main execution core (Vector ALU + Tensor Grid)
+├── top_driver.v                           # Streaming Data Manager / Router
+├── accelerator_connector.v                # Pin-mapping and slicing unit
+├── matrix_driver.v & sub-modules          # 128-bit matrix deserializer
+├── vector_driver.v & sub-modules          # 64-bit vector deserializer
 │
-├── activity.c                               # C-based IEEE VPI activity monitor
-├── tb.v                                     # Functional verification testbench
-├── zero_block_eval_tb.v                     # Zero-blocking power evaluation testbench
+├── tensor_grid_4x4.v                      # 4×4 Tensor Core grid
+├── tensor_core_2x2.v                      # 2×2 Tensor Core building block
+├── vector_alu.v                           # Vector ALU dispatcher
+├── vector_add_sub.v                       # Vector addition/subtraction unit
+├── vector_bitwise.v                       # Vector bitwise operations unit
+├── vector_hadamard.v                      # Hadamard product unit
+├── shifting.v                             # Barrel shifter
+├── dot_product.v                          # Dot product unit
+├── zero_block_detector.v                  # Zero-block detection & gating logic
 │
-├── Custom_parallel_accelerator_Manual.txt   # ISA manual & architecture guide
-├── yosys_tests.ys                           # Yosys synthesis script
-├── generate_schematics.ys                   # Schematic generation script
+├── activity.c                             # C-based IEEE VPI activity monitor
+├── tb_system.v                            # Streaming verification testbench (32-bit bus)
+├── tb.v                                   # Legacy direct-pin testbench
+├── zero_block_eval_tb.v                   # Zero-blocking power evaluation testbench
 │
-└── zero_blocking_evaluation.pdf             # Performance & Power Evaluation
+├── Custom_parallel_accelerator_Manual.txt # ISA manual & architecture guide
+├── yosys_tests.ys                         # Yosys synthesis script
+├── generate_schematics.ys                 # Schematic generation script
+│
+└── zero_blocking_evaluation.pdf           # Performance & Power Evaluation
 ```
 
 ---
@@ -99,6 +112,7 @@ Custom_parallel_accelerator
 Hardware power efficiency is evaluated using an **IEEE VPI activity monitor** (`activity.c`), which tracks logic-level switching activity strictly during active instruction execution.
 
 - **Dynamic Power Reduction:** The zero-blocking optimization successfully reduces dynamic switching activity by up to **45%** in high-sparsity matrix workloads (75% zero tiles).
+- **Architectural Trade-off:** At low sparsity (25%), a minor ~5% control logic overhead is observed due to zero-detection circuitry, which is quickly offset as matrix sparsity increases.
 - **Detailed Evaluation:** For the complete experimental setup, hardware trade-offs, and methodology breakdown, refer to `zero_blocking_evaluation.pdf`.
 
 ---
@@ -115,6 +129,7 @@ Hardware power efficiency is evaluated using an **IEEE VPI activity monitor** (`
 
 ```bash
 # Functional Demo : A full instruction verification deontstrating
+# - 32-bit bus loading
 # - Signed vector addition & arithmetic
 # - Dot product computation
 # - Vector shift & bitwise operations

@@ -1,15 +1,38 @@
 ================================================================================
-                            CUSTOM PARALLEL ACCELERATOR ISA MANUAL
+                        CUSTOM PARACCEL ACCELERATOR ISA MANUAL
 ================================================================================
 
---- GENERAL DATA SIZE (Customizable) ---
+-------------------------- GENERAL DATA SIZE --------------------------
 
 BIT_SIZE      8     // Data width per element (bits)
 VEC_SIZE      8     // Number of vector entries
 TOTAL_SIZE    64    // Total vector size (BIT_SIZE * VEC_SIZE)
 
 
---- EXECUTIONAL COMMAND WORDS (Non-Customizable) ---
+--- 32-BIT STREAMING INTERFACE & DATAPATH ---
+
+To support narrow bus interfaces (such as a 32-bit RISC-V bus), the accelerator 
+utilizes an internal streaming datapath managed by the following modules:
+
+1. 32-bit Bus           : Εxternal data input.
+2. top_driver.v         : Data μanager that distributes 32-bit slices based on target_sel.
+3. matrix/vector_drivers: Deserializers that accumulate slices into wide internal registers:
+                          - Matrix A & B : 128-bit (4 cycles of 32-bit)
+                          - Matrix C     : 256-bit (8 cycles total: 2 x 128-bit blocks)
+                          - Vectors      : 64-bit  (2 cycles of 32-bit)
+4. accelerator_connector: Slicing and pin-mapping unit connecting registers to core pins.
+
+--- TARGET SELECTION CODES (target_sel for streaming bus) ---
+
+3'b000 : Matrix A Driver (128-bit)
+3'b001 : Matrix B Driver (128-bit)
+3'b010 : Matrix C Lower Half (128-bit)
+3'b011 : Matrix C Upper Half (128-bit)
+3'b100 : Vector 1 Driver (64-bit)
+3'b101 : Vector 2 Driver (64-bit)
+
+
+-------------------------- EXECUTIONAL COMMAND WORDS --------------------------
 
 
 --- EXECUTION UNIT SELECTORS (Bits [15:13]) ---
@@ -61,11 +84,11 @@ Thus, in order to get one entry of the result matrix,
 TWO CLOCK CYCLES ARE NEEDED.
 
 ================================================================================
-                              INSTRUCTION WORD FORMAT
+                             INSTRUCTION WORD FORMAT
 ================================================================================
 
   [x x x]    [x x x x]    [x x x]    [x x x]    [x]    [ x x ]
-     a            b            c          d      e        f
+     a           b           c          d        e        f
 
   a) Bits [15:13] : EXEC_UNIT  (3 bits)  - Select computation module (VALU / Tensor grid)
   b) Bits [12:9]  : OPCODE     (4 bits)  - Vector ALU / Tensor opcode
@@ -75,7 +98,7 @@ TWO CLOCK CYCLES ARE NEEDED.
   f) Bits [1:0]   : RESERVED   (2 bits)  - Null - For future expansion
 
 ================================================================================
-                      4x4 MATRIX DECLARATION & LAYOUT
+                     4x4 MATRIX DECLARATION & LAYOUT
 ================================================================================
 
   Logical 4x4 Matrix (A, B or C) viewed as 4 separate 2x2 tensor core tiles.
@@ -84,39 +107,39 @@ TWO CLOCK CYCLES ARE NEEDED.
 +--------------------------------------------------------------------------+
 | 4x4 TENSOR GRID (tensor_grid_4x4.v)                                      |
 |                                                                          |
-|   +-------------------------------+     +---------------------------+    |
-|   | TC (tensor_core_2x2) [0,0]    |     | TC (tensor_core_2x2) [0,1]|    |
-|   |   +------+  +------+          |     |   +------+  +------+      |    |
-|   |   |  DP  |  |  DP  |          |     |   |  DP  |  |  DP  |      |    |
-|   |   +------+  +------+          |     |   +------+  +------+      |    |
-|   |   +------+  +------+          |     |   +------+  +------+      |    |
-|   |   |  DP  |  |  DP  |          |     |   |  DP  |  |  DP  |      |    |
-|   |   +------+  +------+          |     |   +------+  +------+      |    |
-|   +-------------------------------+     +---------------------------+    |
+|    +-------------------------------+     +---------------------------+   |
+|    | TC (tensor_core_2x2) [0,0]    |     | TC (tensor_core_2x2) [0,1]|   |
+|    |   +------+  +------+          |     |   +------+  +------+      |   |
+|    |   |  DP  |  |  DP  |          |     |   |  DP  |  |  DP  |      |   |
+|    |   +------+  +------+          |     |   +------+  +------+      |   |
+|    |   +------+  +------+          |     |   +------+  +------+      |   |
+|    |   |  DP  |  |  DP  |          |     |   |  DP  |  |  DP  |      |   |
+|    |   +------+  +------+          |     |   +------+  +------+      |   |
+|    +-------------------------------+     +---------------------------+   |
 |                                                                          |
-|   +-------------------------------+     +---------------------------+    |
-|   | TC (tensor_core_2x2) [1,0]    |     | TC (tensor_core_2x2) [1,1]|    |
-|   |   +------+  +------+          |     |   +------+  +------+      |    |
-|   |   |  DP  |  |  DP  |          |     |   |  DP  |  |  DP  |      |    |
-|   |   +------+  +------+          |     |   +------+  +------+      |    |
-|   |   +------+  +------+          |     |   +------+  +------+      |    |
-|   |   |  DP  |  |  DP  |          |     |   |  DP  |  |  DP  |      |    |
-|   |   +------+  +------+          |     |   +------+  +------+      |    |
-|   +-------------------------------+     +---------------------------+    |
+|    +-------------------------------+     +---------------------------+   |
+|    | TC (tensor_core_2x2) [1,0]    |     | TC (tensor_core_2x2) [1,1]|   |
+|    |   +------+  +------+          |     |   +------+  +------+      |   |
+|    |   |  DP  |  |  DP  |          |     |   |  DP  |  |  DP  |      |   |
+|    |   +------+  +------+          |     |   +------+  +------+      |   |
+|    |   +------+  +------+          |     |   +------+  +------+      |   |
+|    |   |  DP  |  |  DP  |          |     |   |  DP  |  |  DP  |      |   |
+|    |   +------+  +------+          |     |   +------+  +------+      |   |
+|    +-------------------------------+     +---------------------------+   |
 +--------------------------------------------------------------------------+
 
   4x4 matrix instantiation:
 
-              Col 0        Col 1        Col 2        Col 3
-           +------------+------------+------------+------------+
-     Row 0 | A00_00     | A00_01     | A01_00     | A01_01     | ---> Tile A00 & A01
-           +------------+------------+------------+------------+
-     Row 1 | A00_10     | A00_11     | A01_10     | A01_11     |
-           +------------+------------+------------+------------+
-     Row 2 | A10_00     | A10_01     | A11_00     | A11_01     | ---> Tile A10 & A11
-           +------------+------------+------------+------------+
-     Row 3 | A10_10     | A10_11     | A11_10     | A11_11     |
-           +------------+------------+------------+------------+
+               Col 0        Col 1        Col 2        Col 3
+            +------------+------------+------------+------------+
+      Row 0 | A00_00     | A00_01     | A01_00     | A01_01     | ---> Tile A00 & A01
+            +------------+------------+------------+------------+
+      Row 1 | A00_10     | A00_11     | A01_10     | A01_11     |
+            +------------+------------+------------+------------+
+      Row 2 | A10_00     | A10_01     | A11_00     | A11_01     | ---> Tile A10 & A11
+            +------------+------------+------------+------------+
+      Row 3 | A10_10     | A10_11     | A11_10     | A11_11     |
+            +------------+------------+------------+------------+
 
   
   // Top-Left Tile (A00)
@@ -136,7 +159,7 @@ TWO CLOCK CYCLES ARE NEEDED.
   T_A11_10 = 8'd...;  T_A11_11 = 8'd...;
 
 ================================================================================
-              CUSTOM PARALLEL ACCELERATOR ISA - USAGE EXAMPLES
+             CUSTOM PARALLEL ACCELERATOR ISA - USAGE EXAMPLES
 ================================================================================
 
 This section provides practical examples of 16-bit instruction words mapped 
@@ -151,11 +174,11 @@ representation, binary breakdown, and field-by-field interpretation.
 
 Field Breakdown:
   a) EXEC_UNIT  [15:13]: 3'b001 (UNIT_VECTOR_ALU) - Routes data to Vector ALU
-  b) OPCODE     [12:9] : 4'b0001 (VOP_ADD)        - Selects Add module
-  c) SUB_OP     [8:6]  : 3'b000                   - Unused for additions
-  d) SHIFT_POS  [5:3]  : 3'b000                   - Unused for additions
-  e) ZERO_BLOCK [2]    : 1'b0                     - Not used for vector ALU
-  f) RESERVED   [1:0]  : 2'b00                    - Unused space
+  b) OPCODE     [12:9] : 4'b0001 (VOP_ADD)         - Selects Add module
+  c) SUB_OP     [8:6]  : 3'b000                    - Unused for additions
+  d) SHIFT_POS  [5:3]  : 3'b000                    - Unused for additions
+  e) ZERO_BLOCK [2]    : 1'b0                      - Not used for vector ALU
+  f) RESERVED   [1:0]  : 2'b00                     - Unused space
 
 --------------------------------------------------------------------------------
 2. LOGICAL OPERATION (Bitwise AND)
@@ -165,11 +188,11 @@ Field Breakdown:
 
 Field Breakdown:
   a) EXEC_UNIT  [15:13]: 3'b001 (UNIT_VECTOR_ALU) - Routes data to Vector ALU
-  b) OPCODE     [12:9] : 4'b0010 (VOP_BITWISE)    - Selects Bitwise logic module
-  c) SUB_OP     [8:6]  : 3'b000 (BITWISE_AND)     - Specifies bitwise AND operation
-  d) SHIFT_POS  [5:3]  : 3'b000                   - Unused
-  e) ZERO_BLOCK [2]    : 1'b0                     - Unused
-  f) RESERVED   [1:0]  : 2'b00                    - Unused space
+  b) OPCODE     [12:9] : 4'b0010 (VOP_BITWISE)     - Selects Bitwise logic module
+  c) SUB_OP     [8:6]  : 3'b000 (BITWISE_AND)      - Specifies bitwise AND operation
+  d) SHIFT_POS  [5:3]  : 3'b000                    - Unused
+  e) ZERO_BLOCK [2]    : 1'b0                      - Unused
+  f) RESERVED   [1:0]  : 2'b00                     - Unused space
 
 --------------------------------------------------------------------------------
 3. DATA SHIFTING (Shift Left by 2)
@@ -179,11 +202,11 @@ Field Breakdown:
 
 Field Breakdown:
   a) EXEC_UNIT  [15:13]: 3'b001 (UNIT_VECTOR_ALU) - Routes data to Vector ALU
-  b) OPCODE     [12:9] : 4'b0011 (VOP_SHIFT)      - Selects Shifting module
-  c) SUB_OP     [8:6]  : 3'b000 (SHIFT_LEFT)      - Specifies left shift direction
-  d) SHIFT_POS  [5:3]  : 3'b010 (2)               - Shifts data by 2 positions
-  e) ZERO_BLOCK [2]    : 1'b0                     - Unused
-  f) RESERVED   [1:0]  : 2'b00                    - Unused space
+  b) OPCODE     [12:9] : 4'b0011 (VOP_SHIFT)       - Selects Shifting module
+  c) SUB_OP     [8:6]  : 3'b000 (SHIFT_LEFT)       - Specifies left shift direction
+  d) SHIFT_POS  [5:3]  : 3'b010 (2)                - Shifts data by 2 positions
+  e) ZERO_BLOCK [2]    : 1'b0                      - Unused
+  f) RESERVED   [1:0]  : 2'b00                     - Unused space
 
 --------------------------------------------------------------------------------
 4. TENSOR MATRIX MULTIPLICATION (With Zero Blocking ON)

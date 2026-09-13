@@ -2,7 +2,7 @@ IVERILOG = iverilog
 IVERILOG_VPI = iverilog-vpi
 VVP = vvp
 
-RTL_CODE = top_accelerator.v \
+RTL_CODE =	top_accelerator.v \
 			vector_alu.v \
 			vector_add_sub.v \
 			vector_bitwise.v \
@@ -11,7 +11,16 @@ RTL_CODE = top_accelerator.v \
 			tensor_grid_4x4.v \
 			tensor_core_2x2.v \
 			dot_product.v \
-			zero_block_detector.v
+			zero_block_detector.v \
+			matrix_counter.v \
+			matrix_decoder.v \
+			matrix_driver.v \
+			vector_counter.v \
+			vector_decoder.v \
+			vector_driver.v \
+			top_driver.v \
+			accelerator_connector.v \
+			top_system.v
 
 # VPI Tracking Module
 VPI_SRC = activity.c
