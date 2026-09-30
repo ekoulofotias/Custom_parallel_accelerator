@@ -1,7 +1,9 @@
 # Custom Hardware Parallel Accelerator Architecture with Tensor Cores
 
 **Author:** Stathis Koulofotias 
+
 **Date:** July - September 2026 
+
 **License:** MIT
 
 ---
