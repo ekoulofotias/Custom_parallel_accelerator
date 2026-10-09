@@ -17,9 +17,9 @@ A custom hardware parallel accelerator architecture written in **Verilog**, desi
 - **4×4 Tensor Core Grid** — Hardware-accelerated matrix multiplication with MAC support ($A \times B + C$) via a block matrix multiplication algorithm.
 - **Vector ALU** — Parallel vector operations (addition, bitwise logic, shifts, Hadamard product, dot product).
 - **Zero-Block Detection & Gating** — Dynamic input/clock gating mechanism for sparse matrix multiplication power optimization.
-- **IEEE VPI Activity Tracking** — Integrated C-based VPI module (`activity.c`) for accurate, isolated netlist switching activity (toggling) measurements.
+- **Activity Tracking** — Integrated C-based VPI module (`activity.c`) for accurate, isolated netlist switching activity (toggling) measurements.
 - **Custom 16-bit ISA** — Highly optimized instruction set architecture with field-level control.
-- **Full RTL & Makefile Automation** — Modular testbenches, automated Make targets, synthesis scripts, and schematics.
+- **Full Hardware Description Makefile Automation & Benchmarking** — Modular testbenches, automated Make targets, synthesis scripts, and schematics.
 
 This is an **educational proof-of-concept** demonstrating the fundamental principles of modern parallel accelerator architecture (similar to NVIDIA/AMD Tensor architectures).
 <br clear="right"/>
@@ -61,7 +61,7 @@ To bridge narrow external buses with wide internal registers, the system uses an
 - Gates internal multiplier/accumulator activity while preserving mathematical accuracy.
 - Critical for sparse matrix multiplication energy efficiency.
 
-### IEEE VPI Activity Monitor
+### Activity Monitor
 `activity.c`
 - C-based Verilog Procedural Interface (VPI) module loaded at simulation runtime.
 - Tracks exact netlist value changes (toggles) per instruction step.
@@ -95,7 +95,7 @@ Custom_parallel_accelerator
 ├── dot_product.v                          # Dot product unit
 ├── zero_block_detector.v                  # Zero-block detection & gating logic
 │
-├── activity.c                             # C-based IEEE VPI activity monitor
+├── activity.c                             # C-based VPI activity monitor
 ├── tb_system.v                            # Streaming verification testbench (32-bit bus)
 ├── tb.v                                   # Legacy direct-pin testbench
 ├── zero_block_eval_tb.v                   # Zero-blocking power evaluation testbench
@@ -111,7 +111,7 @@ Custom_parallel_accelerator
 
 ## Performance & Power Evaluation
 
-Hardware power efficiency is evaluated using an **IEEE VPI activity monitor** (`activity.c`), which tracks logic-level switching activity strictly during active instruction execution.
+Hardware power efficiency is evaluated using an **VPI activity monitor** (`activity.c`), which tracks logic-level switching activity strictly during active instruction execution.
 
 - **Dynamic Power Reduction:** The zero-blocking optimization successfully reduces dynamic switching activity by up to **45%** in high-sparsity matrix workloads (75% zero tiles).
 - **Architectural Trade-off:** At low sparsity (25%), a minor ~5% control logic overhead is observed due to zero-detection circuitry, which is quickly offset as matrix sparsity increases.
