@@ -19,7 +19,7 @@ A custom hardware parallel accelerator architecture written in **Verilog**, desi
 - **Zero-Block Detection & Gating** — Dynamic input/clock gating mechanism for sparse matrix multiplication power optimization.
 - **Activity Tracking** — Integrated C-based VPI module (`activity.c`) for accurate, isolated netlist switching activity (toggling) measurements.
 - **Custom 16-bit ISA** — Highly optimized instruction set architecture with field-level control.
-- **Full Hardware Description Makefile Automation & Benchmarking** — Modular testbenches, automated Make targets, synthesis scripts, and schematics.
+- **Full Hardware Description - Makefile Automation & Benchmarking** — Modular testbenches, automated Make targets, synthesis scripts, and schematics.
 
 This is an **educational proof-of-concept** demonstrating the fundamental principles of modern parallel accelerator architecture (similar to NVIDIA/AMD Tensor architectures).
 <br clear="right"/>
