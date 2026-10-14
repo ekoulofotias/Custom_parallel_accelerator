@@ -57,7 +57,7 @@ To bridge narrow external buses with wide internal registers, the system uses an
 
 ### Zero Block Detector
 `zero_block_detector.v`
-- Detects all-zero $2\times 2$ blocks in input matrices.
+- Detects all-zero 2 × 2 blocks in input matrices.
 - Gates internal multiplier/accumulator activity while preserving mathematical accuracy.
 - Critical for sparse matrix multiplication energy efficiency.
 
